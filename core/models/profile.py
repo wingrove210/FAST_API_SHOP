@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class Profile(UserRelationMixin, Base):
-    _user_id_unique = True
+    _user_id_unique = False
     _user_back_populates = "profile"
     first_name: Mapped[Union[str, None]] = mapped_column(String(40))
     last_name: Mapped[Union[str, None]] = mapped_column(String(40))

@@ -22,7 +22,7 @@ from core.config import settings
 target_metadata = Base.metadata
 # target_metadata = None
 
-config.set_main_option("sqlalchmy.url", settings.db_url)
+config.set_main_option("sqlalchmy.url", settings.db.url)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
