@@ -1,12 +1,23 @@
+"""Your migration message
+
+Revision ID: 48472de535ba
+Revises: cbb1915636f8
+Create Date: 2024-11-29 02:32:05.532940
+
+"""
+from typing import Sequence, Union
+
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.engine.reflection import Inspector
 
 
-revision = 'cbb1915636f8'
-down_revision = '66a7b2f44e4a'
-branch_labels = None
-depends_on = None
+# revision identifiers, used by Alembic.
+revision: str = '48472de535ba'
+down_revision: Union[str, None] = 'cbb1915636f8'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
 def table_exists(table_name):
     bind = op.get_bind()
     inspector = Inspector.from_engine(bind)
@@ -25,3 +36,4 @@ def upgrade():
 
 def downgrade():
     op.drop_table('profiles')
+
