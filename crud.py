@@ -255,15 +255,48 @@ async def demo_get_orders_with_products_through_secondary(session: AsyncSession)
             for product in order.products:
                 print("--", product.id, product.name, product.description, product.price)
  
-async def get_orders_with_products_assoc(session: AsyncSession) -> list[Order]:               
-        stmt = select(Order).options(selectinload(Order.product_details)).order_by(Order.id)
-        orders = await session.scalars(stmt)
-        return list(orders)    
+async def get_orders_with_products_assoc(session: AsyncSession) -> list[Order]:
+    stmt = (
+        select(Order)
+        .options(
+            selectinload(Order.products_details).joinedload(
+                OrderProductAssociation.product
+            ),
+        )
+        .order_by(Order.id)
+    )
+    orders = await session.scalars(stmt)
+
+    return list(orders)  
     
-async def demo_get_orders_with_products_through_secondary(session: AsyncSession):
-    orders = await get_orders_with_products_assoc(session=session)   
+async def demo_get_orders_with_products_assoc(session: AsyncSession):
+    orders = await get_orders_with_products_assoc(session=session)
+    for order in orders: 
+        print(order.id, order.promocode, order.created_at, "products:")
+        for order_product_details in order.products_details:
+            print("-", order_product_details.product.name, order_product_details.product.price, "quantity:", order_product_details.count)  
+            
+async def create_gift_product_for_existing_orders(session: AsyncSession):
+    orders = await get_orders_with_products_assoc(session)
+    gift_product = await create_product(
+        session,
+        name="Gift",
+        description="Gift for you",
+        price=0,
+    )
+    for order in orders:
+        order.products_details.append(
+            OrderProductAssociation(
+                count=1,
+                unit_price=0,
+                product=gift_product,
+            )
+        )
+
+    await session.commit() 
 async def demo_m2m(session: AsyncSession):
-    pass
+    # await demo_get_orders_with_products_assoc(session)
+    await create_gift_product_for_existing_orders(session)
             
 async def main():
     async with db_helper.session_factory() as session:
